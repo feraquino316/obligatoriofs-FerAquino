@@ -60,7 +60,7 @@ const putCategoriaController = async (req, res) => {
             res.status(404).json({ message: "Categoría no encontrada" });
         }
     } catch (error) {
-        res.status(500).json({ message: "Ha ocurrido un error", error: error.message });
+        res.status(500).json({ message: "Ha ocurrido un error: ", error: error.message });
     }
 };
 
