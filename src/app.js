@@ -20,7 +20,7 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(loggerMiddleware);
 
-app.use(generalLimiter);
+// app.use(generalLimiter);
 
 app.use('/public', publicRouter);
 
