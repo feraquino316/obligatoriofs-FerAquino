@@ -30,6 +30,22 @@ const getLibrosControllerById = async (req, res) => {
   }
 };
 
+const getLibrosPorCategoriaController = async (req, res) => {
+  const { categoria } = req.params;
+  const { id } = req.user;
+  try {
+    const categoriaExistente = await findCategoriaByNombre(categoria);
+    if (!categoriaExistente) {
+      return res.status(404).json({ message: "Categoría no encontrada" });
+    }
+    const libros = await getLibrosPorCategoria(id, categoria);
+    res.status(200).json(libros);
+  }
+  catch (error) {
+    res.status(500).json({ message: "Ha ocurrido un error: ", error: error.message });
+  }
+};
+
 const postLibrosController = async (req, res) => {
   const { body, user } = req;
 
@@ -106,5 +122,6 @@ module.exports = {
     getLibrosControllerById,
     postLibrosController,
     putLibrosController,
-    deleteLibrosController
+    deleteLibrosController,
+    getLibrosPorCategoriaController
 };

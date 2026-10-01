@@ -5,7 +5,8 @@ const {
     getLibrosControllerById,
     postLibrosController,
     putLibrosController,
-    deleteLibrosController
+    deleteLibrosController,
+    getLibrosPorCategoriaController
 } = require('../controllers/libros.controller');
 
 const {
@@ -26,6 +27,7 @@ const categoriaValidation = require('./validations/categoria.validation');
 privateRouter.put("/usuarios/plan", upgradeUserToPremium);
 privateRouter.get("/libros", getLibrosController);
 privateRouter.get("/libros/:id", getLibrosControllerById);
+privateRouter.get("/libros/categoria/:categoria", getLibrosPorCategoriaController);
 privateRouter.post("/libros", payloadMiddleware(librosValidation), postLibrosController);
 privateRouter.delete("/libros/:id", deleteLibrosController);
 privateRouter.put("/libros/:id", putLibrosController);
