@@ -1,4 +1,4 @@
-const connectMongoDb = require("./models/mongo.client");
+const connectMongoDb = require("../models/mongo.client");
 
 const dbMiddleware = async (req, res, next) => {
     try {
