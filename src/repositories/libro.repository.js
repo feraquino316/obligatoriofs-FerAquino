@@ -1,7 +1,8 @@
 const Libro = require("../models/libro.model");
 const connectToRedis = require("../services/redis.services");
 
-const _getLibrosRedisKey = (userId) => `userId:${userId}-libros`;
+const _getLibrosRedisKey = (userId, page, limit, filtros) =>
+    `userId:${userId}-libros:page:${page}:limit:${limit}:filtros:${JSON.stringify(filtros)}`;
 
 const getLibros = async (userId) => {
     return await Libro.find({ userId });
