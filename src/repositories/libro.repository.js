@@ -73,6 +73,10 @@ const getLibrosPaginated = async (userId, page = 1, limit = 5) => {
     return result;
 };
 
+const getLibrosPorCategoria = async (userId, categoria) => {
+    return await Libro.find({ userId, categoria });
+}
+
 const countLibros = async (userId) => {
     return await Libro.countDocuments({ userId });
 }
@@ -84,5 +88,6 @@ module.exports = {
     deleteLibro,
     updateLibro,
     getLibrosPaginated,
+    getLibrosPorCategoria,
     countLibros
 };

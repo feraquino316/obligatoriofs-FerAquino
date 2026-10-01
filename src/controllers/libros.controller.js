@@ -1,5 +1,5 @@
 const sendMail = require('../services/mailjet.services');
-const { findLibro, createLibro, deleteLibro, updateLibro, getLibrosPaginated, countLibros } = require("../repositories/libro.repository");
+const { findLibro, createLibro, deleteLibro, updateLibro, getLibrosPaginated, countLibros, getLibrosPorCategoria } = require("../repositories/libro.repository");
 const { findCategoriaByNombre } = require("../repositories/categoria.repository");
 
 const getLibrosController = async (req, res) => {
