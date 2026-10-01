@@ -74,7 +74,7 @@ const getLibrosPaginated = async (userId, page = 1, limit = 5) => {
 };
 
 const getLibrosPorCategoria = async (userId, categoria) => {
-    return await Libro.find({ userId, categoria });
+    return await Libro.find({ userId, genero: categoria });
 }
 
 const countLibros = async (userId) => {
