@@ -1,17 +1,17 @@
 const { askGeminiFlash } = require("../services/gemini.services");
-const { findLibro } = require("../repositories/libro.repository");
+const { findLectura } = require("../repositories/lectura.repository");
 
 const generarResenaController = async (req, res) => {
-    const libroId = req.params.id;
+    const lecturaId = req.params.id;
     const { id: userId } = req.user;
 
     try {
-        const libro = await findLibro(libroId, userId);
-        if (!libro) {
-            return res.status(404).json({ message: "Libro no encontrado" });
+        const lectura = await findLectura(lecturaId, userId);
+        if (!lectura) {
+            return res.status(404).json({ message: "Lectura no encontrada" });
         }
 
-        const prompt = `Escribí una reseña breve (máximo 3 oraciones, en español) para el libro "${libro.titulo}" de ${libro.autor}, género ${libro.genero || "no especificado"}.`;
+        const prompt = `Escribí una reseña breve (máximo 3 oraciones, en español) para el libro "${lectura.titulo}" de ${lectura.autor}, género ${lectura.genero || "no especificado"}.`;
 
         try {
             const data = await askGeminiFlash(prompt);
@@ -19,13 +19,13 @@ const generarResenaController = async (req, res) => {
             const resena = parts.find((p) => p.text)?.text || null;
 
             res.status(200).json({
-                libro: libro.titulo,
+                lectura: lectura.titulo,
                 resena: resena || "No se pudo generar la reseña en este momento."
             });
         } catch (iaError) {
             console.error("Gemini no disponible:", iaError.message);
             res.status(200).json({
-                libro: libro.titulo,
+                lectura: lectura.titulo,
                 resena: "El servicio de IA no está disponible en este momento."
             });
         }

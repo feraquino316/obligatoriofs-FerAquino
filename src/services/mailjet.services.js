@@ -1,12 +1,17 @@
 const Mailjet = require('node-mailjet');
+const { escapeHtml } = require('xss');
 
 const mailjet = Mailjet.apiConnect(
     process.env.MJ_APIKEY_PUBLIC,
     process.env.MJ_APIKEY_PRIVATE
 );
 
-const sendMail = async (libro, toEmail, toName = "") => {
-    const { titulo, autor, año, genero, rating } = libro;
+const sendMail = async (lectura, toEmail, toName = "") => {
+    const { año, rating } = lectura;
+    // Se escapan los textos que escribe el usuario para que no se inyecte HTML en el mail
+    const titulo = escapeHtml(lectura.titulo);
+    const autor = escapeHtml(lectura.autor);
+    const genero = lectura.genero ? escapeHtml(lectura.genero) : null;
     const estrellas = rating ? "⭐".repeat(rating) + "☆".repeat(5 - rating) : "Sin calificar";
 
     const fila = (label, value) => value ? `
@@ -29,8 +34,8 @@ const sendMail = async (libro, toEmail, toName = "") => {
                             Name: toName || toEmail
                         }
                     ],
-                    Subject: "Nuevo libro agregado",
-                    TextPart: `Se ha agregado un nuevo libro: ${titulo} - ${autor} (${año || "s/f"}) - Género: ${genero || "-"} - Rating: ${rating || "-"}/5`,
+                    Subject: "Nueva lectura agregada",
+                    TextPart: `Se ha agregado una nueva lectura: ${lectura.titulo} - ${autor} (${año || "s/f"}) - Género: ${genero || "-"} - Rating: ${rating || "-"}/5`,
                     HTMLPart: `
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7; padding:40px 0; font-family: Arial, Helvetica, sans-serif;">
                             <tr>
@@ -58,7 +63,7 @@ const sendMail = async (libro, toEmail, toName = "") => {
                                                     </tr>
                                                 </table>
                                                 <p style="margin:0; font-size:14px; color:#6b7280; line-height:1.5;">
-                                                    Este es un correo automático generado por el sistema de gestión de libros.
+                                                    Este es un correo automático generado por el sistema de gestión de lecturas.
                                                 </p>
                                             </td>
                                         </tr>

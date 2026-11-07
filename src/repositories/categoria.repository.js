@@ -1,5 +1,6 @@
 const Categoria = require("../models/categoria.model");
-const Libro = require("../models/libro.model");
+const Lectura = require("../models/lectura.model");
+const { invalidarCacheLecturas } = require("./lectura.repository");
 
 const getCategorias = async () => {
     return await Categoria.find();
@@ -24,8 +25,15 @@ const updateCategoria = async (id, nombre) => {
     if (!categoria) {
         return null;
     }
+    const nombreAnterior = categoria.nombre;
     categoria.nombre = nombre;
     await categoria.save();
+
+    // Las lecturas guardan el género por nombre, así que hay que renombrarlo también ahí
+    if (nombreAnterior !== nombre) {
+        await Lectura.updateMany({ genero: nombreAnterior }, { genero: nombre });
+        await invalidarCacheLecturas();
+    }
     return categoria;
 };
 
@@ -35,9 +43,9 @@ const deleteCategoria = async (id) => {
         return { notFound: true };
     }
 
-    const librosAsociados = await Libro.countDocuments({ genero: categoria.nombre });
-    if (librosAsociados > 0) {
-        return { conflict: true, cantidad: librosAsociados };
+    const lecturasAsociadas = await Lectura.countDocuments({ genero: categoria.nombre });
+    if (lecturasAsociadas > 0) {
+        return { conflict: true, cantidad: lecturasAsociadas };
     }
 
     await Categoria.deleteOne({ _id: id });

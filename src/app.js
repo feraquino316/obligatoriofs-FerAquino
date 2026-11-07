@@ -38,8 +38,13 @@ app.use('/v1/uploads', uploadsRouter);
 app.use('/v1/ia', iaRouter);
 
 app.use((err, req, res, next) => {
-    console.error("Error en el servidor:", err);
-    res.status(err.status || 500).json({ message: 'Ocurrió un error en el servidor' });
+    // Errores de Multer (ej: archivo de más de 5MB) son errores del cliente
+    const status = err.name === 'MulterError' ? 400 : (err.status || 500);
+    if (status >= 500) {
+        console.error("Error en el servidor:", err);
+        return res.status(status).json({ message: 'Ocurrió un error en el servidor' });
+    }
+    res.status(status).json({ message: err.message });
 });
 
 module.exports = app;

@@ -1,12 +1,18 @@
 const express = require('express');
 const privateRouter = express.Router();
 const {
-    getLibrosController,
-    getLibrosControllerById,
-    postLibrosController,
-    putLibrosController,
-    deleteLibrosController,
-    getLibrosPorCategoriaController
+    getLecturasController,
+    getLecturaByIdController,
+    postLecturaController,
+    putLecturaController,
+    putImagenLecturaController,
+    deleteLecturaController,
+    getLecturasPorCategoriaController
+} = require('../controllers/lecturas.controller');
+
+const {
+    buscarLibrosController,
+    getLibroApiByIdController
 } = require('../controllers/libros.controller');
 
 const {
@@ -21,21 +27,31 @@ const { upgradeUserToPremium } = require('../controllers/usuarios.controller');
 
 const payloadMiddleware = require('../middlewares/payload.middleware');
 const adminMiddleware = require('../middlewares/admin.middleware');
-const librosValidation = require('./validations/libro.validation');
+const objectIdMiddleware = require('../middlewares/objectId.middleware');
+const { upload } = require('../middlewares/multer.middleware');
+const { lecturaValidation, lecturaUpdateValidation } = require('./validations/lectura.validation');
 const categoriaValidation = require('./validations/categoria.validation');
 
 privateRouter.put("/usuarios/plan", upgradeUserToPremium);
-privateRouter.get("/libros", getLibrosController);
-privateRouter.get("/libros/:id", getLibrosControllerById);
-privateRouter.get("/libros/categoria/:categoria", getLibrosPorCategoriaController);
-privateRouter.post("/libros", payloadMiddleware(librosValidation), postLibrosController);
-privateRouter.delete("/libros/:id", deleteLibrosController);
-privateRouter.put("/libros/:id", putLibrosController);
 
+// Lecturas (biblioteca personal del usuario)
+privateRouter.get("/lecturas", getLecturasController);
+privateRouter.get("/lecturas/categoria/:categoria", getLecturasPorCategoriaController);
+privateRouter.get("/lecturas/:id", objectIdMiddleware, getLecturaByIdController);
+privateRouter.post("/lecturas", payloadMiddleware(lecturaValidation), postLecturaController);
+privateRouter.put("/lecturas/:id", objectIdMiddleware, payloadMiddleware(lecturaUpdateValidation), putLecturaController);
+privateRouter.put("/lecturas/:id/imagen", objectIdMiddleware, upload.single("imagen"), putImagenLecturaController);
+privateRouter.delete("/lecturas/:id", objectIdMiddleware, deleteLecturaController);
+
+// Libros (catálogo de la API externa)
+privateRouter.get("/libros/buscar", buscarLibrosController);
+privateRouter.get("/libros/:libroApiId", getLibroApiByIdController);
+
+// Categorías
 privateRouter.get("/categorias", getCategoriasController);
-privateRouter.get("/categorias/:id", getCategoriaByIdController);
+privateRouter.get("/categorias/:id", objectIdMiddleware, getCategoriaByIdController);
 privateRouter.post("/categorias", adminMiddleware, payloadMiddleware(categoriaValidation), postCategoriaController);
-privateRouter.put("/categorias/:id", adminMiddleware, payloadMiddleware(categoriaValidation), putCategoriaController);
-privateRouter.delete("/categorias/:id", adminMiddleware, deleteCategoriaController);
+privateRouter.put("/categorias/:id", adminMiddleware, objectIdMiddleware, payloadMiddleware(categoriaValidation), putCategoriaController);
+privateRouter.delete("/categorias/:id", adminMiddleware, objectIdMiddleware, deleteCategoriaController);
 
 module.exports = privateRouter;

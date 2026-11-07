@@ -15,7 +15,13 @@ const upgradeUserToPremium = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: usuarioActualizado._id, username: usuarioActualizado.username, premium: usuarioActualizado.premium },
+            {
+                id: usuarioActualizado._id.toString(),
+                username: usuarioActualizado.username,
+                email: usuarioActualizado.email,
+                admin: usuarioActualizado.admin,
+                premium: usuarioActualizado.premium
+            },
             process.env.AUTH_SECRET_KEY,
             { expiresIn: '1h' }
         );

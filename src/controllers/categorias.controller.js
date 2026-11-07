@@ -73,7 +73,7 @@ const deleteCategoriaController = async (req, res) => {
         }
         if (resultado.conflict) {
             return res.status(400).json({
-                message: `No se puede borrar: hay ${resultado.cantidad} libro(s) con esta categoría asignada`
+                message: `No se puede borrar: hay ${resultado.cantidad} lectura(s) con esta categoría asignada`
             });
         }
         res.status(200).json({ message: "Categoría eliminada exitosamente" });

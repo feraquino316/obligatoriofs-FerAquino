@@ -5,6 +5,10 @@ const findUserByUsername = async (username) => {
     return await User.findOne({username:username});
 }
 
+const findUserByEmail = async (email) => {
+    return await User.findOne({ email: email });
+}
+
 const upgradeToPremium = async (userId) => {
     const user = await User.findById(userId);
     if (!user) {
@@ -29,6 +33,7 @@ const saveUser = async (username, email, password) => {
 
 module.exports = {
     findUserByUsername,
+    findUserByEmail,
     saveUser,
     upgradeToPremium
 }
