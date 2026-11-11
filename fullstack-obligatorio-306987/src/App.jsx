@@ -1,3 +1,7 @@
+import Login from './pages/Login';
+import Registro from './pages/Registro';
+import Dashboard from './pages/Dashboard';
+
 const App = () => {
       let personas = [
         { id: 1, nombre: 'Juan', edad: 25 },
@@ -5,7 +9,6 @@ const App = () => {
         { id: 3, nombre: 'Pedro', edad: 20 },
       ];
 
-        <div>
       return (
         <div>
           <h1>Lista de Personas</h1>
@@ -18,7 +21,6 @@ const App = () => {
           </ul>
         </div>
       );
-    </div>
 }
 
 export default App
