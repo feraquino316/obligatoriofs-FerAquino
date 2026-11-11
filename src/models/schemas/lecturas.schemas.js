@@ -7,7 +7,7 @@ const lecturasSchema = new mongoose.Schema({
     año: { type: Number },
     genero: { type: String },
     rating: { type: Number, min: 1, max: 5 },
-    imagenLibro: { type: String, default: null }, // URL de Cloudinary (o de la API de libros)
+    imagenLibro: { type: String, default: null }, // URL de Cloudinary (solo se carga con PUT /lecturas/:id/imagen)
     libroApiId: { type: String, default: null }   // ID del libro en la API externa, si se importó desde ahí
 },
 {

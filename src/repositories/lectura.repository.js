@@ -30,14 +30,14 @@ const findLectura = async (lecturaId, userId) => {
 };
 
 const createLectura = async (userId, datos) => {
-    const { titulo, autor, año, genero, rating, imagenLibro, libroApiId } = datos;
+    // imagenLibro no se recibe acá: se asigna después subiendo la imagen a Cloudinary
+    const { titulo, autor, año, genero, rating, libroApiId } = datos;
     const nuevaLectura = new Lectura({
         titulo,
         autor,
         año,
         genero: genero ?? null,
         rating: rating ?? null,
-        imagenLibro: imagenLibro ?? null,
         libroApiId: libroApiId ?? null,
         userId
     });
@@ -46,12 +46,17 @@ const createLectura = async (userId, datos) => {
     return nuevaLectura;
 };
 
+// Devuelve la lectura borrada (o null si no existía), así el controller puede borrar su imagen
 const deleteLectura = async (lecturaId, userId) => {
-    const resultado = await Lectura.deleteOne({ _id: lecturaId, userId: userId });
-    if (resultado.deletedCount > 0) {
+    const lecturaBorrada = await Lectura.findOneAndDelete({ _id: lecturaId, userId: userId });
+    if (lecturaBorrada) {
         await invalidarCacheLecturas(userId);
     }
-    return resultado;
+    return lecturaBorrada;
+};
+
+const findLecturaByLibroApiId = async (userId, libroApiId) => {
+    return await Lectura.findOne({ userId, libroApiId });
 };
 
 const updateLectura = async (lecturaId, userId, payload) => {
@@ -70,14 +75,19 @@ const updateLectura = async (lecturaId, userId, payload) => {
     return lectura;
 };
 
+// Si Redis no responde, se sigue con MongoDB: el cache es una mejora, no puede tirar abajo la app
 const getLecturasPaginated = async (userId, page = 1, limit = 5) => {
     const redisClient = connectToRedis();
     const lecturasRedisKey = _getLecturasRedisKey(userId, page, limit);
 
-    const cached = await redisClient.get(lecturasRedisKey);
-    if (cached) {
-        console.log("Informacion obtenida de Redis...");
-        return cached;
+    try {
+        const cached = await redisClient.get(lecturasRedisKey);
+        if (cached) {
+            console.log("Informacion obtenida de Redis...");
+            return cached;
+        }
+    } catch (error) {
+        console.error("Redis no disponible, se consulta MongoDB:", error.message);
     }
     console.log("Buscando informacion en MongoDB...");
     const skip = (page - 1) * limit;
@@ -93,7 +103,11 @@ const getLecturasPaginated = async (userId, page = 1, limit = 5) => {
         total,
         totalPages: Math.ceil(total / limit)
     };
-    await redisClient.set(lecturasRedisKey, JSON.stringify(result), { ex: 3600 });
+    try {
+        await redisClient.set(lecturasRedisKey, JSON.stringify(result), { ex: 3600 });
+    } catch (error) {
+        console.error("No se pudo guardar en Redis:", error.message);
+    }
     return result;
 };
 
@@ -108,6 +122,7 @@ const countLecturas = async (userId) => {
 module.exports = {
     getLecturas,
     findLectura,
+    findLecturaByLibroApiId,
     createLectura,
     deleteLectura,
     updateLectura,

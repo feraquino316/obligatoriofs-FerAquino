@@ -6,7 +6,7 @@ const lecturaValidation = joi.object({
     año: joi.number().integer().min(0).optional(),
     genero: joi.string().min(2).max(30).optional(),
     rating: joi.number().integer().min(1).max(5).optional(),
-    imagenLibro: joi.string().uri().allow(null).optional(),
+    // imagenLibro no se acepta en el body: la portada solo se carga por Cloudinary (PUT /lecturas/:id/imagen)
     libroApiId: joi.string().allow(null).optional()
 });
 

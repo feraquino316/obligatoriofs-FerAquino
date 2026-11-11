@@ -1,8 +1,9 @@
 const sendMail = require('../services/mailjet.services');
 const cloudinary = require("../config/cloudinary.config");
-const { uploadBufferToCloudinary } = require("../utils/cloudinary.util");
+const { uploadBufferToCloudinary, deleteImageFromCloudinary } = require("../utils/cloudinary.util");
 const {
   findLectura,
+  findLecturaByLibroApiId,
   createLectura,
   deleteLectura,
   updateLectura,
@@ -77,6 +78,10 @@ const postLecturaController = async (req, res) => {
       }
     }
 
+    if (body.libroApiId && await findLecturaByLibroApiId(user.id, body.libroApiId)) {
+      return res.status(400).json({ message: "Ya tenés este libro en tus lecturas" });
+    }
+
     const nuevaLectura = await createLectura(user.id, body);
 
     try {
@@ -103,6 +108,13 @@ const putLecturaController = async (req, res) => {
       const categoria = await findCategoriaByNombre(body.genero);
       if (!categoria) {
         return res.status(400).json({ message: "La categoría (género) no existe" });
+      }
+    }
+
+    if (body.libroApiId) {
+      const existente = await findLecturaByLibroApiId(id, body.libroApiId);
+      if (existente && existente._id.toString() !== lecturaId) {
+        return res.status(400).json({ message: "Ya tenés este libro en tus lecturas" });
       }
     }
 
@@ -138,7 +150,14 @@ const putImagenLecturaController = async (req, res) => {
       folder: "lecturas"
     });
 
+    const imagenAnterior = lectura.imagenLibro;
     const lecturaActualizada = await updateLectura(lecturaId, id, { imagenLibro: result.secure_url });
+
+    // Si ya tenía portada, se borra la vieja para no dejar imágenes huérfanas
+    if (imagenAnterior) {
+      await deleteImageFromCloudinary(cloudinary, imagenAnterior);
+    }
+
     res.status(200).json({
       message: "Imagen asignada correctamente",
       lectura: lecturaActualizada
@@ -154,8 +173,11 @@ const deleteLecturaController = async (req, res) => {
   const { id } = req.user;
 
   try {
-    const resultado = await deleteLectura(lecturaId, id);
-    if (resultado.deletedCount > 0) {
+    const lecturaBorrada = await deleteLectura(lecturaId, id);
+    if (lecturaBorrada) {
+      if (lecturaBorrada.imagenLibro) {
+        await deleteImageFromCloudinary(cloudinary, lecturaBorrada.imagenLibro);
+      }
       res.status(200).json({ message: "Lectura eliminada correctamente" });
     } else {
       res.status(404).json({ message: "Lectura no encontrada" });

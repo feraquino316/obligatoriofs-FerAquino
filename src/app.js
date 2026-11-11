@@ -11,7 +11,6 @@ const dbMiddleware = require('./middlewares/db.middleware');
 const router = require('./routes/private.router');
 const publicRouter = require('./routes/public.router');
 const authRouter = require('./routes/auth.router');
-const uploadsRouter = require('./routes/uploads.router');
 const iaRouter = require('./routes/ia.router');
 const { generalLimiter } = require("./middlewares/rateLimit.middleware");
 
@@ -32,8 +31,6 @@ app.use(authMiddleware);
 
 //privado
 app.use('/v1', router);
-
-app.use('/v1/uploads', uploadsRouter);
 
 app.use('/v1/ia', iaRouter);
 
