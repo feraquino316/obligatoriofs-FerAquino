@@ -1,35 +1,69 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
 import { agregarLectura } from '../store/slices/lecturasSlice';
-import { crearLecturaApi } from '../services/api';
+import { crearLecturaApi, subirImagenApi } from '../services/api';
+
+const anioActual = new Date().getFullYear();
+
+const schema = yup.object({
+  titulo: yup.string().required('El título es obligatorio').max(200, 'Máximo 200 caracteres'),
+  autor: yup.string().required('El autor es obligatorio').min(2, 'Mínimo 2 caracteres').max(150, 'Máximo 150 caracteres'),
+  anio: yup.number()
+    .transform((v, original) => (original === '' ? undefined : v))
+    .integer('Tiene que ser un año entero')
+    .min(0, 'Año inválido')
+    .max(anioActual, `No puede ser mayor a ${anioActual}`)
+    .optional(),
+  genero: yup.string().optional(),
+  rating: yup.number()
+    .transform((v, original) => (original === '' ? undefined : v))
+    .integer('Tiene que ser un número entero')
+    .min(1, 'Mínimo 1')
+    .max(5, 'Máximo 5')
+    .optional(),
+});
 
 const FormLectura = () => {
-  const [titulo, setTitulo] = useState('');
-  const [autor, setAutor] = useState('');
-  const [anio, setAnio] = useState('');
-  const [genero, setGenero] = useState('');
-  const [rating, setRating] = useState('');
   const [error, setError] = useState('');
+  const [archivo, setArchivo] = useState(null);
+  const [guardando, setGuardando] = useState(false);
 
   const token = useSelector((state) => state.auth.token);
-  const categorias = useSelector((state) => state.categorias.lista);
   const usuario = useSelector((state) => state.auth.usuario);
   const lecturas = useSelector((state) => state.lecturas.lista);
+  const categorias = useSelector((state) => state.categorias.lista);
   const dispatch = useDispatch();
 
-  const agregar = async () => {
-    const nueva = { titulo, autor };
-    if (anio) nueva.año = Number(anio);
-    if (genero) nueva.genero = genero;
-    if (rating) nueva.rating = Number(rating);
+  const { register, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm({
+    resolver: yupResolver(schema),
+    mode: 'onChange',
+  });
 
+  const genero = watch('genero');
+
+  const agregar = async (datos) => {
+    const nueva = { titulo: datos.titulo, autor: datos.autor };
+    if (datos.anio !== undefined) nueva.año = datos.anio;
+    if (datos.genero) nueva.genero = datos.genero;
+    if (datos.rating !== undefined) nueva.rating = datos.rating;
+
+    setGuardando(true);
     try {
-      const creada = await crearLecturaApi(nueva, token);
+      let creada = await crearLecturaApi(nueva, token);
+      if (archivo) {
+        creada = await subirImagenApi(creada._id, archivo, token);
+      }
       dispatch(agregarLectura(creada));
-      setTitulo(''); setAutor(''); setAnio(''); setGenero(''); setRating('');
+      reset();
+      setArchivo(null);
       setError('');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setGuardando(false);
     }
   };
 
@@ -49,45 +83,54 @@ const FormLectura = () => {
   return (
     <div className="card p-3 mb-3">
       <h5>Agregar lectura</h5>
-      <div className="row g-2">
+      <form onSubmit={handleSubmit(agregar)} className="row g-2">
         <div className="col-md-6">
-          <input type="text" className="form-control" placeholder="Título"
-            value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+          <input type="text" placeholder="Título"
+            className={`form-control ${errors.titulo ? 'is-invalid' : ''}`}
+            {...register('titulo')} />
+          {errors.titulo && <div className="invalid-feedback">{errors.titulo.message}</div>}
         </div>
         <div className="col-md-6">
-          <input type="text" className="form-control" placeholder="Autor"
-            value={autor} onChange={(e) => setAutor(e.target.value)} />
+          <input type="text" placeholder="Autor"
+            className={`form-control ${errors.autor ? 'is-invalid' : ''}`}
+            {...register('autor')} />
+          {errors.autor && <div className="invalid-feedback">{errors.autor.message}</div>}
         </div>
         <div className="col-md-4">
-          <input type="number" className="form-control" placeholder="Año"
-            value={anio} onChange={(e) => setAnio(e.target.value)} />
+          <input type="number" placeholder="Año"
+            className={`form-control ${errors.anio ? 'is-invalid' : ''}`}
+            {...register('anio')} />
+          {errors.anio && <div className="invalid-feedback">{errors.anio.message}</div>}
         </div>
         <div className="col-md-4">
-          <select className="form-select" value={genero} onChange={(e) => setGenero(e.target.value)}>
+          <select className={`form-select ${genero ? '' : 'text-muted'}`} defaultValue="" {...register('genero')}>
             <option value="" disabled hidden>Género</option>
+            <option value="">Sin género</option>
             {categorias.map((c) => (
               <option key={c._id} value={c.nombre}>{c.nombre}</option>
             ))}
           </select>
         </div>
         <div className="col-md-4">
-          <input type="number" className="form-control" placeholder="Rating (1-5)" min="1" max="5"
-            value={rating} onChange={(e) => setRating(e.target.value)} />
+          <input type="number" placeholder="Rating (1-5)"
+            className={`form-control ${errors.rating ? 'is-invalid' : ''}`}
+            {...register('rating')} />
+          {errors.rating && <div className="invalid-feedback">{errors.rating.message}</div>}
         </div>
         <div className="col-12">
-          <input type="file" className="form-control" accept="image/*" />
+          <label className="form-label small text-muted mb-1">Portada (opcional)</label>
+          <input type="file" className="form-control" accept="image/*"
+            onChange={(e) => setArchivo(e.target.files[0])} />
         </div>
 
-        <div className="col-12">
-          {error && <div className="alert alert-danger">{error}</div>}
-        </div>
+        {error && <div className="col-12"><div className="alert alert-danger mb-0">{error}</div></div>}
 
         <div className="col-12">
-          <button className="btn btn-primary w-100" disabled={!titulo || autor.length < 2} onClick={agregar}>
-            Agregar
+          <button type="submit" className="btn btn-primary w-100" disabled={!isValid || guardando}>
+            {guardando ? 'Guardando...' : 'Agregar'}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

@@ -5,6 +5,7 @@ import CambioPlan from '../componentes/CambioPlan';
 import Grafico from '../componentes/Grafico';
 import FormLectura from '../componentes/FormLectura';
 import Filtro from '../componentes/Filtro';
+import AdminCategorias from '../componentes/AdminCategorias';
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -41,6 +42,7 @@ const Dashboard = () => {
             <InformeUso />
             <CambioPlan />
             <Grafico />
+            {usuario.admin && <AdminCategorias />}
           </div>
           <div className="col-md-8">
             <FormLectura />

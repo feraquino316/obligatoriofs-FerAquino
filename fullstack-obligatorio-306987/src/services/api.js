@@ -97,5 +97,53 @@ export const cambiarPlanApi = async (token) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message);
-  return data;   // { message, token }
+  return data;   
+};
+
+export const subirImagenApi = async (id, archivo, token) => {
+  const formData = new FormData();
+  formData.append('imagen', archivo);
+
+  const res = await fetch(`${API_URL}/lecturas/${id}/imagen`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data.lectura;   
+};
+
+const errorMsg = (data) => Array.isArray(data.message) ? data.message.join(', ') : data.message;
+
+export const crearCategoriaApi = async (nombre, token) => {
+  const res = await fetch(`${API_URL}/categorias`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ nombre }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(errorMsg(data));
+  return data.categoria;
+};
+
+export const editarCategoriaApi = async (id, nombre, token) => {
+  const res = await fetch(`${API_URL}/categorias/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ nombre }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(errorMsg(data));
+  return data;
+};
+
+export const eliminarCategoriaApi = async (id, token) => {
+  const res = await fetch(`${API_URL}/categorias/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(errorMsg(data));
+  return data;
 };

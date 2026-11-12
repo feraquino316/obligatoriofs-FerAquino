@@ -61,7 +61,12 @@ const ItemLectura = ({ lectura }) => {
 
   return (
     <tr>
-      <td>{lectura.titulo}</td>
+      <td>
+        {lectura.imagenLibro && (
+          <img src={lectura.imagenLibro} alt="" style={{ width: 32, height: 48, objectFit: 'cover' }} className="me-2 rounded" />
+        )}
+        {lectura.titulo}
+      </td>
       <td>{lectura.autor}</td>
       <td>{lectura.genero}</td>
       <td>{lectura.rating}</td>
