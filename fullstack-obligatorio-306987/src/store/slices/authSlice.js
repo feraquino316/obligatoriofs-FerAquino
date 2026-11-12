@@ -1,7 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const leerUsuario = () => {
+  try {
+    return JSON.parse(localStorage.getItem('usuario'));
+  } catch {
+    localStorage.removeItem('usuario');
+    localStorage.removeItem('token');
+    return null;
+  }
+};
+
 const initialState = {
-  usuario: JSON.parse(localStorage.getItem('usuario')),
+  usuario: leerUsuario(),
   token: localStorage.getItem('token'),
 };
 
@@ -18,7 +28,7 @@ const authSlice = createSlice({
       state.token = null;
     },
     pasarAPremium: (state, action) => {
-      state.token = action.payload;      // el token nuevo
+      state.token = action.payload;      
       state.usuario.premium = true;
     },
   },
