@@ -1,15 +1,15 @@
 import ItemLectura from './ItemLectura';
+import { useSelector } from 'react-redux';
 
 const ListaLecturas = () => {
-  const lecturas = [
-    { _id: '1', titulo: 'Rayuela', autor: 'Cortázar', genero: 'Novela', rating: 5 },
-    { _id: '2', titulo: 'Ficciones', autor: 'Borges', genero: 'Cuento', rating: 4 },
-    { _id: '3', titulo: '1984', autor: 'Orwell', genero: 'Distopía', rating: 5 },
-  ];
+  const lecturas = useSelector((state) => state.lecturas.lista);
 
   return (
     <div className="card p-3">
       <h5>Mis lecturas</h5>
+
+      {lecturas.length === 0 && <p className="text-muted">Todavía no agregaste lecturas.</p>}
+
       <table className="table table-hover">
         <thead>
           <tr>

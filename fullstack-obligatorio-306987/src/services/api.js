@@ -27,3 +27,48 @@ export const registroApi = async (username, email, password) => {
     }
     return data;
 };
+
+export const getLecturasApi = async (token) => {
+  const res = await fetch(`${API_URL}/lecturas?limit=100`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data.data;  
+};
+
+export const eliminarLecturaApi = async (id, token) => {
+  const res = await fetch(`${API_URL}/lecturas/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data;
+};
+
+export const getCategoriasApi = async (token) => {
+  const res = await fetch(`${API_URL}/categorias`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data;   
+};
+
+export const crearLecturaApi = async (lectura, token) => {
+  const res = await fetch(`${API_URL}/lecturas`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(lectura),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+    throw new Error(msg);
+  }
+  return data.lectura;   
+};
