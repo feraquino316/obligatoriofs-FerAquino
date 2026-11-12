@@ -64,7 +64,7 @@ const FormLectura = () => {
         </div>
         <div className="col-md-4">
           <select className="form-select" value={genero} onChange={(e) => setGenero(e.target.value)}>
-            <option value="">Género</option>
+            <option value="" disabled hidden>Género</option>
             {categorias.map((c) => (
               <option key={c._id} value={c.nombre}>{c.nombre}</option>
             ))}
