@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 const Registro = () => {
   return (
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
@@ -29,7 +30,7 @@ const Registro = () => {
         <button className="btn btn-primary w-100">Registrarme</button>
 
         <p className="text-center mt-3">
-          ¿Ya tenés cuenta? <a href="#">Iniciá sesión</a>
+          ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link>
         </p>
       </div>
     </div>
