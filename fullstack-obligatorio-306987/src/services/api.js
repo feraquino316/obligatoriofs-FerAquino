@@ -89,3 +89,13 @@ export const editarLecturaApi = async (id, cambios, token) => {
   }
   return data;
 };
+
+export const cambiarPlanApi = async (token) => {
+  const res = await fetch(`${API_URL}/usuarios/plan`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data;   // { message, token }
+};

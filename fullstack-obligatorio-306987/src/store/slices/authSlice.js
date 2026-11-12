@@ -17,8 +17,13 @@ const authSlice = createSlice({
       state.usuario = null;
       state.token = null;
     },
+    pasarAPremium: (state, action) => {
+      state.token = action.payload;      // el token nuevo
+      state.usuario.premium = true;
+    },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+
+export const { login, logout, pasarAPremium } = authSlice.actions;
 export default authSlice.reducer;

@@ -6,7 +6,7 @@ import Grafico from '../componentes/Grafico';
 import FormLectura from '../componentes/FormLectura';
 import Filtro from '../componentes/Filtro';
 import { Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getLecturasApi, getCategoriasApi } from '../services/api';
 import { setLecturas } from '../store/slices/lecturasSlice';
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const usuario = useSelector((state) => state.auth.usuario);
   const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
+  const [generoFiltro, setGeneroFiltro] = useState('');
 
   useEffect(() => {
     if (!token) return;
@@ -43,8 +44,8 @@ const Dashboard = () => {
           </div>
           <div className="col-md-8">
             <FormLectura />
-            <Filtro />
-            <ListaLecturas />
+            <Filtro genero={generoFiltro} setGenero={setGeneroFiltro} />
+            <ListaLecturas generoFiltro={generoFiltro} />
           </div>
         </div>
       </div>

@@ -1,8 +1,11 @@
 import ItemLectura from './ItemLectura';
 import { useSelector } from 'react-redux';
 
-const ListaLecturas = () => {
+const ListaLecturas = ({ generoFiltro }) => {
   const lecturas = useSelector((state) => state.lecturas.lista);
+  const filtradas = generoFiltro
+    ? lecturas.filter((l) => l.genero === generoFiltro)
+    : lecturas;
 
   return (
     <div className="card p-3">
@@ -21,7 +24,7 @@ const ListaLecturas = () => {
           </tr>
         </thead>
         <tbody>
-          {lecturas.map((lectura) => (
+          {filtradas.map((lectura) => (
             <ItemLectura key={lectura._id} lectura={lectura} />
           ))}
         </tbody>
