@@ -72,3 +72,20 @@ export const crearLecturaApi = async (lectura, token) => {
   }
   return data.lectura;   
 };
+
+export const editarLecturaApi = async (id, cambios, token) => {
+  const res = await fetch(`${API_URL}/lecturas/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(cambios),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+    throw new Error(msg);
+  }
+  return data;
+};
