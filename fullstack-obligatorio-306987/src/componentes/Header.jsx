@@ -7,10 +7,12 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-const cerrarSesion = () => {
-  dispatch(logout());
-  navigate('/login');
-};
+  const cerrarSesion = () => {
+    dispatch(logout());
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    navigate('/login');
+  };
 
 
   return (

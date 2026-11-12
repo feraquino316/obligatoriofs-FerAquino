@@ -11,4 +11,19 @@ export const loginApi = async (username, password) => {
         const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message;
         throw new Error(msg);
     }
+    return data;
+};
+
+export const registroApi = async (username, email, password) => {
+    const res = await fetch(`${API_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+        throw new Error(msg);
+    }
+    return data;
 };

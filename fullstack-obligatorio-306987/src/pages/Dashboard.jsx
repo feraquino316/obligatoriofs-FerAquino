@@ -5,8 +5,13 @@ import CambioPlan from '../componentes/CambioPlan';
 import Grafico from '../componentes/Grafico';
 import FormLectura from '../componentes/FormLectura';
 import Filtro from '../componentes/Filtro';
+import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
 const Dashboard = () => {
+  const usuario = useSelector((state) => state.auth.usuario);
+  if (!usuario) return <Navigate to="/login" />;
+  
   return (
     <>
       <Header />

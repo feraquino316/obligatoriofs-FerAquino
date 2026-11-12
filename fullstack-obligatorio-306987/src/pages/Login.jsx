@@ -15,6 +15,8 @@ const Login = () => {
     try {
       const data = await loginApi(username, password);
       dispatch(login(data));
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -36,7 +38,7 @@ const Login = () => {
           <input type="password" id="password" className="form-control"
             value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
-        
+
         {error && <div className="alert alert-danger">{error}</div>}
 
         <button className="btn btn-primary w-100"
