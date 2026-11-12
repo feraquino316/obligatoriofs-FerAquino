@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { agregarLectura } from '../store/slices/lecturasSlice';
 import { buscarLibrosApi, crearLecturaApi } from '../services/api';
+const LIMITE = Number(import.meta.env.VITE_LIMITE_PLUS);
 
 const BuscarLibros = ({ onElegir }) => {
     const [texto, setTexto] = useState('');
@@ -15,7 +16,7 @@ const BuscarLibros = ({ onElegir }) => {
     const lecturas = useSelector((state) => state.lecturas.lista);
     const dispatch = useDispatch();
 
-    const llegoAlLimite = !usuario.premium && lecturas.length >= 4;
+    const llegoAlLimite = !usuario.premium && lecturas.length >= LIMITE;
 
     const buscar = async (e) => {
         e.preventDefault();

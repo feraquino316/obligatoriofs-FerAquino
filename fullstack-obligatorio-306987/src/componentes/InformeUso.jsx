@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux';
+const LIMITE = Number(import.meta.env.VITE_LIMITE_PLUS);
 
 const InformeUso = () => {
   const usuario = useSelector((state) => state.auth.usuario);
   const cantidad = useSelector((state) => state.lecturas.lista.length);
-  const LIMITE = 4;
 
   if (usuario.premium) {
     return (

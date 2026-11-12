@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
 import { agregarLectura } from '../store/slices/lecturasSlice';
 import { crearLecturaApi, subirImagenApi } from '../services/api';
+const LIMITE = Number(import.meta.env.VITE_LIMITE_PLUS);
 
 const anioActual = new Date().getFullYear();
 
@@ -81,7 +82,7 @@ const FormLectura = ({ libro, limpiarLibro }) => {
     }
   };
 
-  const llegoAlLimite = !usuario.premium && lecturas.length >= 4;
+  const llegoAlLimite = !usuario.premium && lecturas.length >= LIMITE;
 
   if (llegoAlLimite) {
     return (

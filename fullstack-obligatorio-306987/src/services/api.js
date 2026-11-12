@@ -156,3 +156,13 @@ export const buscarLibrosApi = async (texto, token) => {
   if (!res.ok) throw new Error(errorMsg(data));
   return data.data;
 };
+
+export const generarResenaApi = async (id, token) => {
+  const res = await fetch(`${API_URL}/ia/lecturas/${id}/resena`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(errorMsg(data));
+  return data.resena;
+};
