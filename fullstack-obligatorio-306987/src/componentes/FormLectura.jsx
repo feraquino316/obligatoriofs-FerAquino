@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -26,7 +26,7 @@ const schema = yup.object({
     .optional(),
 });
 
-const FormLectura = () => {
+const FormLectura = ({ libro, limpiarLibro }) => {
   const [error, setError] = useState('');
   const [archivo, setArchivo] = useState(null);
   const [guardando, setGuardando] = useState(false);
@@ -42,10 +42,23 @@ const FormLectura = () => {
     mode: 'onChange',
   });
 
+  useEffect(() => {
+  if (libro) {
+    reset({
+      titulo: libro.titulo.slice(0, 200),
+      autor: libro.autor || 'Autor desconocido',
+      anio: libro.año ?? '',
+      genero: '',
+      rating: '',
+    });
+  }
+}, [libro]);
+  
   const genero = watch('genero');
 
   const agregar = async (datos) => {
     const nueva = { titulo: datos.titulo, autor: datos.autor };
+    if (libro) nueva.libroApiId = libro.libroApiId;
     if (datos.anio !== undefined) nueva.año = datos.anio;
     if (datos.genero) nueva.genero = datos.genero;
     if (datos.rating !== undefined) nueva.rating = datos.rating;
@@ -58,6 +71,7 @@ const FormLectura = () => {
       }
       dispatch(agregarLectura(creada));
       reset();
+      limpiarLibro();
       setArchivo(null);
       setError('');
     } catch (err) {

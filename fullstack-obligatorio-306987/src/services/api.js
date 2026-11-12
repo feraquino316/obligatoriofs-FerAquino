@@ -147,3 +147,12 @@ export const eliminarCategoriaApi = async (id, token) => {
   if (!res.ok) throw new Error(errorMsg(data));
   return data;
 };
+
+export const buscarLibrosApi = async (texto, token) => {
+  const res = await fetch(`${API_URL}/libros/buscar?q=${encodeURIComponent(texto)}&limit=8`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(errorMsg(data));
+  return data.data;
+};
